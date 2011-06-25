@@ -1,0 +1,96 @@
+/* $Id$
+ * Created on 28.10.2003
+ */
+package test;
+
+import java.util.Date;
+
+import osc.OSCBundle;
+import osc.OSCMessage;
+import osc.OSCPacket;
+import utils.OSCByteArrayToPacketConverter;
+import datatypes.OSCByteStream;
+import datatypes.OSCDataType;
+import datatypes.OSCFloat32;
+import datatypes.OSCInt32;
+import datatypes.OSCString;
+
+/**
+ * @author cramakrishnan
+ * 
+ * Copyright (C) 2003, C. Ramakrishnan / Auracle All rights reserved.
+ * 
+ * See license.txt (or license.rtf) for license information.
+ */
+public class OSCByteArrayToPacketConverterTest extends junit.framework.TestCase {
+
+	OSCByteArrayToPacketConverter converter;
+
+	/**
+	 * Run the OSCByteArrayToJavaConverter through its paces
+	 */
+	public OSCByteArrayToPacketConverterTest() {
+		super();
+	}
+
+	/**
+	 * @see junit.framework.TestCase#setUp()
+	 */
+	protected void setUp() throws Exception {
+		converter = new OSCByteArrayToPacketConverter();
+	}
+
+	/**
+	 * @see junit.framework.TestCase#tearDown()
+	 */
+	protected void tearDown() throws Exception {
+
+	}
+
+	public void testReadSimplePacket() throws Exception {
+		byte[] bytes = { 47, 115, 99, 47, 114, 117, 110, 0, 44, 0, 0, 0 };
+		OSCMessage packet = (OSCMessage) converter.convert( new OSCByteStream(bytes));
+		if (!packet.getAddress().getString().equals("/sc/run"))
+			fail("Address should be /sc/run, but is " + packet.getAddress());
+	}
+
+	public void testReadComplexPacket() throws Exception {
+		byte[] bytes = { 0x2F, 0x73, 0x5F, 0x6E, 0x65, 0x77, 0, 0, 0x2C, 0x69,
+				0x73, 0x66, 0, 0, 0, 0, 0, 0, 0x3, (byte) 0xE9, 0x66, 0x72,
+				0x65, 0x71, 0, 0, 0, 0, 0x43, (byte) 0xDC, 0, 0 };
+
+		OSCMessage packet = (OSCMessage) converter.convert(new OSCByteStream(bytes));
+		if (!packet.getAddress().getString().equals("/s_new"))
+			fail("Address should be /s_new, but is " + packet.getAddress());
+		OSCDataType[] arguments = packet.getArguments();
+		if (arguments.length != 3)
+			fail("Num arguments should be 3, but is " + arguments.length);
+		if (((OSCInt32) arguments[0]).getInteger() != 1001)
+			fail("Argument 1 should be 1001, but is "
+					+ ((OSCInt32) arguments[0]).getInteger());
+		if (!(((OSCString) arguments[1]).getString().equals("freq")))
+			fail("Argument 2 should be freq, but is "
+					+ ((OSCString) arguments[1]).getString());
+		if (((OSCFloat32) arguments[2]).getFloat() != 440.0)
+			fail("Argument 3 should be 440.0, but is "
+					+ ((OSCFloat32) arguments[2]).getFloat());
+	}
+
+	public void testReadBundle() throws Exception {
+		byte[] bytes = { 0x23, 0x62, 0x75, 0x6E, 0x64, 0x6C, 0x65, 0, 0, 0, 0,
+				0, 0, 0, 0, 1, 0, 0, 0, 0x0C, 0X2F, 0x74, 0x65, 0x73, 0x74, 0,
+				0, 0, 0x2C, 0, 0, 0 };
+
+		OSCBundle bundle = (OSCBundle) converter.convert(new OSCByteStream(bytes));
+		if (bundle.getTimestamp().compareTo(new Date(0)) != 0)
+			fail("Timestamp should be " + new Date(0) + ", but is "
+					+ bundle.getTimestamp().getTimetag());
+		OSCPacket[] packets = bundle.getPackets();
+		if (packets.length != 1)
+			fail("Num packets should be 1, but is " + packets.length);
+		OSCMessage message = (OSCMessage) packets[0];
+		if (!("/test".equals(message.getAddress().getString())))
+			fail("Address of message should be /test, but is "
+					+ message.getAddress());
+	}
+}
