@@ -80,12 +80,12 @@ public class OSCByteArrayToPacketConverter {
 
 		oscMessage.setAddress(addressPattern);
 
-		if (byteStream.available() == 0)
+		if (byteStream.available() <= 0)
 			return oscMessage;
 
 		if (byteStream.readSilent(1)[0] != ',' && enforceTypeTags) {
 			throw new OSCDataObjectFormatException(
-					OSCDataObjectFormatException.ILLEGAL_ADDRESS_PATTERN_START,
+					OSCDataObjectFormatException.ILLEGAL_TYPE_STRING_START,
 					',', startChar, this);
 		}
 

@@ -75,6 +75,7 @@ public class ByteArrayToPacketPerformanceTest extends TestCase {
 	}
 	
 	
+@SuppressWarnings("unused")
 private boolean compare(OSCPacket inPac, OSCPacket outPac) throws Exception {
 		
 		if((inPac instanceof OSCBundle) && (outPac instanceof OSCPacket)){

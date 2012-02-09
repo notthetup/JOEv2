@@ -2,6 +2,7 @@ package utils;
 
 import datatypes.OSCByteStream;
 import datatypes.OSCDataType;
+import datatypes.OSCInt32;
 import datatypes.OSCString;
 
 import osc.OSCBundle;
@@ -65,12 +66,17 @@ public class OSCPacketToByteArrayConverter {
 		for (int index = 0; index < packetArray.length; index++) {
 
 			if (packetArray[index] instanceof OSCBundle) {
-				convertBundle((OSCBundle) packetArray[index]);
+				OSCByteStream bundByteStream = convertBundle((OSCBundle) packetArray[index]);
+				byteStream.write((new OSCInt32(bundByteStream.size())).getByteArray());
+				byteStream.write(bundByteStream.toByteArray());
 			} else if (packetArray[index] instanceof OSCMessage) {
-				convertMessage((OSCMessage) packetArray[index]);
+				OSCByteStream messageByteStream = convertMessage((OSCMessage) packetArray[index]);
+				byteStream.write((new OSCInt32(messageByteStream.size())).getByteArray());
+				byteStream.write(messageByteStream.toByteArray());
 			}
 		}
 
+		
 		return byteStream;
 	}
 }

@@ -12,11 +12,12 @@ public class OSCByteStream {
 	private int writeIndex = 0;
 
 	public OSCByteStream() throws OSCDataObjectFormatException {
-		this(new byte[32]);
+		this(new byte[0]);
 	}
 
 	public OSCByteStream(int size) throws OSCDataObjectFormatException {
 		this(new byte[size]);
+		this.writeIndex = 0;
 	}
 
 	public OSCByteStream(byte[] byteArray) throws OSCDataObjectFormatException {
@@ -32,6 +33,7 @@ public class OSCByteStream {
 					4, byteArray.length, this);
 
 		this.buf = byteArray;
+		this.writeIndex = this.buf.length;
 	}
 
 	public byte[] read(int size) throws OSCByteStreamException {
@@ -75,7 +77,11 @@ public class OSCByteStream {
 	public int available() {
 		return (buf.length - readIndex);
 	}
-
+	
+	public int size() {
+		return buf.length;
+	}
+	
 	public void write(byte[] byteArray) throws OSCByteStreamException {
 
 		if (byteArray == null)

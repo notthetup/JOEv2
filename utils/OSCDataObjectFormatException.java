@@ -8,7 +8,7 @@ public class OSCDataObjectFormatException extends Exception {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final int ILEGAL_DATA_BYTE_ARRAY_LENGTH = 1;
 	public static final int ILEGAL_DATE_FORMAT = 2;
 	public static final int BLOB_SIZE_MISMATCH = 3;
@@ -17,8 +17,9 @@ public class OSCDataObjectFormatException extends Exception {
 	public static final int INVALID_MIDI_DATA = 6;
 	public static final int MISSING_ADDRESS_PATTERN_END = 7;
 	public static final int ILLEGAL_ADDRESS_PATTERN_LEGTH = 8;
-	public static final int ILLEGAL_ADDRESS_PATTERN_START = 9;
-	
+	public static final int ILLEGAL_TYPE_STRING_START = 9;
+	public static final int ILLEGAL_ADDRESS_PATTERN_START = 10;
+
 	private long expectedLength = 0; 
 	private long observedLength = 0;
 	private int reason = 0;
@@ -30,24 +31,26 @@ public class OSCDataObjectFormatException extends Exception {
 		this.expectedLength = expected;
 		this.observedLength = observed;
 	}
-	
+
 	@Override
 	public void printStackTrace() {
-	    switch (reason) {
-	    
-	    case ILLEGAL_ADDRESS_PATTERN_START:
-	    	System.err.println("Invalid OSC Address String start character. Expected : 0x" + (byte)expectedLength + " Observed : 0x" + (byte)observedLength);
+		switch (reason) {
+		case ILLEGAL_ADDRESS_PATTERN_START:
+			System.err.println("Invalid OSC Type String start character. Expected : 0x47" + " Observed : 0x" + (byte)observedLength);
 			break;
-	    case ILLEGAL_ADDRESS_PATTERN_LEGTH:
+		case ILLEGAL_TYPE_STRING_START:
+			System.err.println("Invalid OSC Type String start character. Expected : 0x44" + " Observed : 0x" + (byte)observedLength);
+			break;
+		case ILLEGAL_ADDRESS_PATTERN_LEGTH:
 			System.err.println("OSC Address String not multiple of 4. Expected : " + expectedLength + " Observed : " + observedLength);	
 			break;
-	    case MISSING_ADDRESS_PATTERN_END:
+		case MISSING_ADDRESS_PATTERN_END:
 			System.err.println("End of OSC Address Sring not found.");	
 			break;
-	    case INVALID_MIDI_DATA:
+		case INVALID_MIDI_DATA:
 			System.err.println("MIDI Data Encapsulation Error : " + ((InvalidMidiDataException)source).getMessage());	
 			break;
-	    case TIME_TAG_ENCLOSING_ERROR:
+		case TIME_TAG_ENCLOSING_ERROR:
 			System.err.println("Outside Timetag is later than inside Timetag. Outside : " + this.expectedLength + " Inside : " + this.observedLength );	
 			break;
 		case ILEGAL_INPUT_BYTE_ARRAY_LENGTH:
@@ -68,7 +71,7 @@ public class OSCDataObjectFormatException extends Exception {
 		}    
 		super.printStackTrace();
 	}
-	
-	
+
+
 
 }
